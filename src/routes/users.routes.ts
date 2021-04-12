@@ -1,26 +1,28 @@
 import { Router } from "express";
 
-import { createUserController } from "../modules/users/useCases/createUser";
-import { listAllUsersController } from "../modules/users/useCases/listAllUsers";
-import { showUserProfileController } from "../modules/users/useCases/showUserProfile";
-import { turnUserAdminController } from "../modules/users/useCases/turnUserAdmin";
+import { UsersRepositories } from "../modules/users/repositories/UsersRepositories";
 
 const usersRoutes = Router();
+const usersRepositories = new UsersRepositories();
 
-usersRoutes.post("/", (request, response) =>
-  createUserController.handle(request, response)
-);
+usersRoutes.post("/", (request, response) => {
+  const { name, email } = request.body;
 
-usersRoutes.patch("/:user_id/admin", (request, response) =>
-  turnUserAdminController.handle(request, response)
-);
+  const userAlreadyExists = usersRepositories.findByEmail(email);
 
-usersRoutes.get("/:user_id", (request, response) =>
-  showUserProfileController.handle(request, response)
-);
+  if (userAlreadyExists) {
+    return response.status(401).json({ error: "User already exists" });
+  }
 
-usersRoutes.get("/", (request, response) =>
-  listAllUsersController.handle(request, response)
-);
+  usersRepositories.create({ name, email });
+
+  return response.status(201).send();
+});
+
+usersRoutes.get("/", (request, response) => {
+  const users = usersRepositories.list();
+
+  return response.json(users);
+});
 
 export { usersRoutes };
