@@ -1,25 +1,26 @@
 import { Router } from "express";
 
-import { UsersRepositories } from "../modules/users/repositories/UsersRepositories";
-import { CreateUserService } from "../modules/users/services/CreateUserService";
+import { createUserController } from "../modules/users/useCases/createUser";
+import { listAllUsersController } from "../modules/users/useCases/listAllUsers";
+import { showUserProfileController } from "../modules/users/useCases/showUserProfile";
+import { turnUserAdminController } from "../modules/users/useCases/turnUserAdmin";
 
 const usersRoutes = Router();
-const usersRepositories = new UsersRepositories();
 
 usersRoutes.post("/", (request, response) => {
-  const { name, email } = request.body;
+  return createUserController.handle(request, response);
+});
 
-  const createUserService = new CreateUserService(usersRepositories);
+usersRoutes.patch("/:user_id/admin", (request, response) => {
+  turnUserAdminController.handle(request, response);
+});
 
-  createUserService.execute({ name, email });
-
-  return response.status(201).send();
+usersRoutes.get("/:user_id", (request, response) => {
+  showUserProfileController.handle(request, response);
 });
 
 usersRoutes.get("/", (request, response) => {
-  const users = usersRepositories.list();
-
-  return response.json(users);
+  listAllUsersController.handle(request, response);
 });
 
 export { usersRoutes };
