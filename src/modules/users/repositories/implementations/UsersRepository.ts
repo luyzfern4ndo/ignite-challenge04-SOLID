@@ -28,8 +28,6 @@ class UsersRepository implements IUsersRepository {
       updated_at: new Date(),
     });
 
-    console.log(user);
-
     this.users.push(user);
 
     return user;
@@ -39,13 +37,13 @@ class UsersRepository implements IUsersRepository {
     return this.users;
   }
 
-  findByEmail(email: string): User {
+  findByEmail(email: string): User | undefined {
     const user = this.users.find((user) => user.email === email);
 
     return user;
   }
 
-  findById(id: string): User {
+  findById(id: string): User | undefined {
     const user = this.users.find((user) => user.id === id);
 
     return user;
